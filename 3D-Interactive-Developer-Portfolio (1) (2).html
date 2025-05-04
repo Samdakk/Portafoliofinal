@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Portfolio</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6366f1',secondary:'#8b5cf6'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Poppins', sans-serif;
+overflow-x: hidden;
+background-color: #f8f9ff;
+}
+@media (max-width: 768px) {
+.custom-cursor, .cursor-dot {
+display: none;
+}
+.section {
+padding-top: 60px;
+padding-bottom: 60px;
+}
+.cube-container {
+transform: scale(0.8);
+}
+.project-card:hover {
+transform: none;
+}
+.tilt-card {
+transform: none !important;
+}
+}
+.section {
+min-height: 100vh;
+opacity: 0;
+transform: translateY(50px);
+transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.section.active {
+opacity: 1;
+transform: translateY(0);
+}
+.cube-container {
+perspective: 1000px;
+width: 150px;
+height: 150px;
+}
+.cube {
+width: 100%;
+height: 100%;
+position: relative;
+transform-style: preserve-3d;
+animation: rotate 15s infinite linear;
+}
+.cube-face {
+position: absolute;
+width: 150px;
+height: 150px;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(255, 255, 255, 0.8);
+border: 2px solid rgba(99, 102, 241, 0.3);
+box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+backface-visibility: visible;
+}
+.front { transform: translateZ(75px); }
+.back { transform: rotateY(180deg) translateZ(75px); }
+.right { transform: rotateY(90deg) translateZ(75px); }
+.left { transform: rotateY(-90deg) translateZ(75px); }
+.top { transform: rotateX(90deg) translateZ(75px); }
+.bottom { transform: rotateX(-90deg) translateZ(75px); }
+@keyframes rotate {
+0% { transform: rotateX(0) rotateY(0); }
+100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+.tilt-card {
+transform-style: preserve-3d;
+transition: transform 0.5s ease;
+}
+.skill-card {
+transition: transform 0.6s;
+transform-style: preserve-3d;
+position: relative;
+}
+.skill-card.flipped {
+transform: rotateY(180deg);
+}
+.skill-front, .skill-back {
+backface-visibility: hidden;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+}
+.skill-front {
+z-index: 2;
+transform: rotateY(0deg);
+}
+.skill-back {
+transform: rotateY(180deg);
+}
+.progress-bar {
+height: 12px;
+background: rgba(99, 102, 241, 0.2);
+border-radius: 6px;
+overflow: hidden;
+position: relative;
+}
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, #6366f1, #8b5cf6);
+border-radius: 6px;
+width: 0%;
+position: relative;
+transition: width 1.5s ease;
+box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+.progress-fill::after {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg,
+rgba(255,255,255,0) 0%,
+rgba(255,255,255,0.3) 50%,
+rgba(255,255,255,0) 100%);
+animation: shine 2s infinite;
+}
+@keyframes shine {
+0% { transform: translateX(-100%); }
+100% { transform: translateX(100%); }
+}
+.project-card {
+transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.project-card:hover {
+transform: translateY(-10px) scale(1.02);
+box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.2), 0 10px 10px -5px rgba(99, 102, 241, 0.1);
+}
+.scroll-indicator {
+animation: bounce 2s infinite;
+}
+@keyframes bounce {
+0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+40% { transform: translateY(-20px); }
+60% { transform: translateY(-10px); }
+}
+.typing-effect::after {
+content: '|';
+animation: blink 1s infinite;
+}
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0; }
+}
+.custom-cursor {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+background-color: rgba(99, 102, 241, 0.3);
+position: fixed;
+pointer-events: none;
+z-index: 9999;
+transform: translate(-50%, -50%);
+transition: width 0.3s, height 0.3s, background-color 0.3s;
+mix-blend-mode: difference;
+}
+.cursor-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background-color: #6366f1;
+position: fixed;
+pointer-events: none;
+z-index: 10000;
+transform: translate(-50%, -50%);
+}
+input[type="text"], input[type="email"], textarea {
+transition: all 0.3s ease;
+border: 2px solid transparent;
+}
+input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+border-color: #6366f1;
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.floating {
+animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+0% { transform: translateY(0px); }
+50% { transform: translateY(-15px); }
+100% { transform: translateY(0px); }
+}
+.particles {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+overflow: hidden;
+z-index: -1;
+}
+.particle {
+position: absolute;
+border-radius: 50%;
+background: rgba(99, 102, 241, 0.2);
+animation: particleAnimation 15s infinite linear;
+}
+@keyframes particleAnimation {
+0% {
+transform: translateY(0) translateX(0);
+opacity: 1;
+}
+100% {
+transform: translateY(-1000px) translateX(100px);
+opacity: 0;
+}
+}
+.glow-button {
+position: relative;
+overflow: hidden;
+}
+.glow-button::after {
+content: '';
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+opacity: 0;
+transform: scale(0.5);
+transition: transform 0.5s, opacity 0.5s;
+}
+.glow-button:hover::after {
+opacity: 0.3;
+transform: scale(1);
+}
+/* Hide scrollbar but allow scrolling */
+body::-webkit-scrollbar {
+display: none;
+}
+body {
+-ms-overflow-style: none;
+scrollbar-width: none;
+}
+</style>
+</head>
+<body class="relative">
+<div class="custom-cursor"></div>
+<div class="cursor-dot"></div>
+<!-- Hero Section -->
+<section id="hero" class="section flex items-center justify-center min-h-screen relative overflow-hidden">
+<div class="particles"></div>
+<div class="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between">
+<div class="md:w-1/2 text-center md:text-left mb-12 md:mb-0">
+<h1 class="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-gray-800 hero-title">
+<span class="block">Lucas Vazquez</span>
+<span class="text-primary">Full Stack Developer</span>
+</h1>
+<p class="text-xl md:text-2xl text-gray-600 mb-8 typing-effect">Crafting digital experiences with code and creativity</p>
+<div class="flex flex-wrap gap-4 justify-center md:justify-start">
+<a href="#projects" class="bg-primary text-white px-8 py-3 rounded-button font-medium hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl whitespace-nowrap">View Projects</a>
+<a href="#contact" class="border-2 border-primary text-primary px-8 py-3 rounded-button font-medium hover:bg-primary hover:text-white transition-all whitespace-nowrap">Contact Me</a>
+</div>
+</div>
+<div class="md:w-1/2 flex justify-center">
+<div class="cube-container">
+<div class="cube">
+<div class="cube-face front">
+<i class="ri-reactjs-line ri-3x text-primary"></i>
+</div>
+<div class="cube-face back">
+<i class="ri-nodejs-line ri-3x text-primary"></i>
+</div>
+<div class="cube-face right">
+<i class="ri-database-2-line ri-3x text-primary"></i>
+</div>
+<div class="cube-face left">
+<i class="ri-code-s-slash-line ri-3x text-primary"></i>
+</div>
+<div class="cube-face top">
+<i class="ri-terminal-box-line ri-3x text-primary"></i>
+</div>
+<div class="cube-face bottom">
+<i class="ri-cloud-line ri-3x text-primary"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 scroll-indicator">
+<div class="flex flex-col items-center">
+<span class="text-gray-500 mb-2">Scroll Down</span>
+<i class="ri-arrow-down-line ri-xl text-primary"></i>
+</div>
+</div>
+</section>
+<!-- About Section -->
+<section id="about" class="section min-h-screen flex items-center py-20 bg-white">
+<div class="container mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16 text-gray-800">About <span class="text-primary">Me</span></h2>
+<div class="flex flex-col md:flex-row items-center gap-12">
+<div class="md:w-1/2">
+<div class="tilt-card bg-white p-8 rounded-xl shadow-xl">
+<h3 class="text-2xl font-semibold mb-4 text-gray-800">Hello, I'm Lucas!</h3>
+<p class="text-gray-600 mb-6">With over 5 years of experience in full stack development, I've mastered the art of crafting seamless digital experiences that blend functionality with stunning design.</p>
+<p class="text-gray-600 mb-6">I specialize in building interactive web applications using modern technologies like React, Node.js, and MongoDB, always staying at the cutting edge of web development trends.</p>
+<p class="text-gray-600">When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or mentoring aspiring developers.</p>
+<div class="mt-8 flex gap-4">
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-github-fill ri-lg"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-linkedin-fill ri-lg"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-twitter-fill ri-lg"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-dribbble-fill ri-lg"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="md:w-1/2 flex justify-center">
+<div class="relative w-80 h-80 floating">
+<img src="https://static.readdy.ai/image/9b07bc0d425e056754f41d293acd1c21/5f74aa444987f7ed158c22562b773de4.jpeg" alt="Developer Avatar" class="w-full h-full object-cover rounded-full shadow-2xl border-4 border-primary">
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Skills Section -->
+<section id="skills" class="section min-h-screen flex items-center py-20 bg-gradient-to-b from-white to-gray-50">
+<div class="container mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16 text-gray-800">My Super <span class="text-primary">Powers</span></h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-12">
+<!-- Skill 1 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-bug-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-gray-800">Bug Whisperer</h3>
+<p class="text-gray-600 text-center text-lg leading-relaxed mb-2">I can hear what the bugs are saying and convince them to leave peacefully</p>
+<button class="mt-auto text-primary font-medium flex items-center gap-2 skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-2xl font-bold mb-8 text-gray-800 text-center">Bug Whispering Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Debugging Mastery</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="95"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Error Tracking</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="90"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Problem Solving</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="98"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+<!-- Skill 2 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-code-box-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-bold mb-2 text-gray-800">Code Ninja</h3>
+<p class="text-gray-600 text-center">I move silently through codebases, leaving only elegant solutions behind</p>
+<button class="mt-6 text-primary font-medium flex items-center gap-2 skill-flip-btn">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-xl font-bold mb-6 text-gray-800 text-center">Code Ninja Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Frontend Mastery</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="92"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Backend Wizardry</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="94"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Clean Code</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="96"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+<!-- Skill 3 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-database-2-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-bold mb-2 text-gray-800">Database Tamer</h3>
+<p class="text-gray-600 text-center">I speak fluent SQL and NoSQL, making databases do incredible tricks</p>
+<button class="mt-6 text-primary font-medium flex items-center gap-2 skill-flip-btn">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-xl font-bold mb-6 text-gray-800 text-center">Database Taming Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">SQL Databases</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="93"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">NoSQL Databases</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="91"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Data Modeling</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="88"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+<!-- Skill 4 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-api-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-bold mb-2 text-gray-800">API Wizard</h3>
+<p class="text-gray-600 text-center">I cast powerful spells that make APIs communicate perfectly</p>
+<button class="mt-6 text-primary font-medium flex items-center gap-2 skill-flip-btn">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-xl font-bold mb-6 text-gray-800 text-center">API Wizardry Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">RESTful APIs</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="97"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">GraphQL</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="89"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">API Security</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="94"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+<!-- Skill 5 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-layout-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-bold mb-2 text-gray-800">Pixel Perfect Warrior</h3>
+<p class="text-gray-600 text-center">I fight for pixel perfection, ensuring every UI element is exactly right</p>
+<button class="mt-6 text-primary font-medium flex items-center gap-2 skill-flip-btn">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-xl font-bold mb-6 text-gray-800 text-center">Pixel Perfect Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">CSS Mastery</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="96"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Responsive Design</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="98"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">UI Frameworks</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="95"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+<!-- Skill 6 -->
+<div class="skill-card min-h-[420px]">
+<div class="skill-front bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+<div class="w-20 h-20 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-8">
+<i class="ri-server-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-bold mb-2 text-gray-800">Server Side Sorcerer</h3>
+<p class="text-gray-600 text-center">I conjure powerful backend systems that handle anything thrown at them</p>
+<button class="mt-6 text-primary font-medium flex items-center gap-2 skill-flip-btn">
+<span>See My Power Level</span>
+<i class="ri-arrow-right-line"></i>
+</button>
+</div>
+<div class="skill-back bg-white p-8 rounded-xl shadow-lg flex flex-col justify-center">
+<h3 class="text-xl font-bold mb-6 text-gray-800 text-center">Server Side Skills</h3>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Node.js</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="95"></div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Server Architecture</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="92"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-600">Microservices</span>
+<span class="text-primary font-medium skill-percentage">0%</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" data-percentage="90"></div>
+</div>
+</div>
+<button class="mt-8 text-primary font-medium flex items-center gap-2 justify-center skill-flip-btn hover:bg-primary hover:bg-opacity-10 px-4 py-2 rounded-full transition-all">
+<i class="ri-arrow-left-line"></i>
+<span>Back to Skill</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Projects Section -->
+<section id="projects" class="section min-h-screen flex items-center py-20 bg-white">
+<div class="container mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16 text-gray-800">Featured <span class="text-primary">Projects</span></h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+<!-- Project 1 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=modern%20e-commerce%20website%20interface%20with%20clean%20design%2C%20product%20showcase%2C%20shopping%20cart%2C%20minimalist%20UI%2C%20professional%20web%20design%2C%20high%20quality%20render&width=600&height=400&seq=project1&orientation=landscape" alt="E-commerce Platform" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-shopping-cart-2-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">ShopWave E-commerce</h3>
+<p class="text-gray-600 mb-4">A full-featured e-commerce platform with real-time inventory, payment processing, and user authentication.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">React</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Node.js</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">MongoDB</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Stripe</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+<!-- Project 2 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=task%20management%20dashboard%20interface%20with%20calendar%20view%2C%20task%20cards%2C%20progress%20charts%2C%20modern%20UI%20design%2C%20professional%20web%20application%2C%20high%20quality%20render&width=600&height=400&seq=project2&orientation=landscape" alt="Task Management App" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-task-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">TaskMaster Pro</h3>
+<p class="text-gray-600 mb-4">An intuitive task management application with drag-and-drop interface, team collaboration, and analytics.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Vue.js</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Express</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">PostgreSQL</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Socket.io</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+<!-- Project 3 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=social%20media%20analytics%20dashboard%20with%20data%20visualization%2C%20charts%2C%20user%20engagement%20metrics%2C%20modern%20UI%20design%2C%20professional%20web%20application%2C%20high%20quality%20render&width=600&height=400&seq=project3&orientation=landscape" alt="Analytics Dashboard" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-line-chart-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">InsightPulse Analytics</h3>
+<p class="text-gray-600 mb-4">A comprehensive analytics dashboard with real-time data visualization, custom reports, and predictive analytics.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Angular</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Django</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Redis</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">D3.js</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+<!-- Project 4 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=mobile%20fitness%20app%20interface%20with%20workout%20tracking%2C%20progress%20charts%2C%20nutrition%20planning%2C%20modern%20UI%20design%2C%20professional%20mobile%20application%2C%20high%20quality%20render&width=600&height=400&seq=project4&orientation=landscape" alt="Fitness App" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-heart-pulse-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">FitTrack Pro</h3>
+<p class="text-gray-600 mb-4">A fitness tracking application with personalized workout plans, nutrition tracking, and progress visualization.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">React Native</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Firebase</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">GraphQL</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">TensorFlow</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+<!-- Project 5 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=real%20estate%20property%20listing%20website%20interface%20with%20property%20cards%2C%20map%20view%2C%20search%20filters%2C%20modern%20UI%20design%2C%20professional%20web%20application%2C%20high%20quality%20render&width=600&height=400&seq=project5&orientation=landscape" alt="Real Estate Platform" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-home-4-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">HomeHarbor</h3>
+<p class="text-gray-600 mb-4">A real estate platform with virtual tours, mortgage calculator, and AI-powered property recommendations.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Next.js</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Python</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">AWS</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Three.js</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+<!-- Project 6 -->
+<div class="project-card bg-white rounded-xl overflow-hidden shadow-lg">
+<div class="relative h-56">
+<img src="https://readdy.ai/api/search-image?query=online%20learning%20platform%20interface%20with%20course%20cards%2C%20video%20player%2C%20progress%20tracking%2C%20modern%20UI%20design%2C%20professional%20web%20application%2C%20high%20quality%20render&width=600&height=400&seq=project6&orientation=landscape" alt="Learning Platform" class="w-full h-full object-cover">
+<div class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md">
+<i class="ri-book-open-line text-primary"></i>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold mb-2 text-gray-800">EduSpark LMS</h3>
+<p class="text-gray-600 mb-4">An online learning platform with interactive courses, real-time collaboration, and AI-powered learning recommendations.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Svelte</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">Flask</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">MySQL</span>
+<span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">WebRTC</span>
+</div>
+<a href="#" class="inline-block bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all glow-button whitespace-nowrap">View Project</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Section -->
+<section id="contact" class="section min-h-screen flex items-center py-20 bg-gradient-to-b from-gray-50 to-white">
+<div class="container mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16 text-gray-800">Get In <span class="text-primary">Touch</span></h2>
+<div class="flex flex-col md:flex-row gap-8 md:gap-12">
+<div class="w-full md:w-1/2">
+<div class="bg-white p-8 rounded-xl shadow-xl transform hover:scale-[1.02] transition-all">
+<h3 class="text-2xl font-semibold mb-6 text-gray-800">Send Me a Message</h3>
+<form class="space-y-6">
+<div>
+<label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+<input type="text" id="name" class="w-full px-4 py-3 rounded border-none bg-gray-50 focus:ring-2 focus:ring-primary focus:ring-opacity-50 outline-none transition-all" placeholder="John Doe">
+</div>
+<div>
+<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+<input type="email" id="email" class="w-full px-4 py-3 rounded border-none bg-gray-50 focus:ring-2 focus:ring-primary focus:ring-opacity-50 outline-none transition-all" placeholder="john@example.com">
+</div>
+<div>
+<label for="message" class="block text-sm font-medium text-gray-700 mb-1">Your Message</label>
+<textarea id="message" rows="5" class="w-full px-4 py-3 rounded border-none bg-gray-50 focus:ring-2 focus:ring-primary focus:ring-opacity-50 outline-none transition-all" placeholder="Hello, I'd like to discuss a project..."></textarea>
+</div>
+<button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-button font-medium hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl glow-button whitespace-nowrap">Send Message</button>
+</form>
+</div>
+</div>
+<div class="md:w-1/2">
+<div class="bg-white p-8 rounded-xl shadow-xl h-full">
+<h3 class="text-2xl font-semibold mb-6 text-gray-800">Contact Information</h3>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full flex-shrink-0 mt-1">
+<i class="ri-mail-line text-primary"></i>
+</div>
+<div>
+<h4 class="text-lg font-medium text-gray-800">Email</h4>
+<p class="text-gray-600">vazquezlucas721@gmail.com</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full flex-shrink-0 mt-1">
+<i class="ri-phone-line text-primary"></i>
+</div>
+<div>
+<h4 class="text-lg font-medium text-gray-800">Phone</h4>
+<p class="text-gray-600">+598 924 484</p>
+<p class="text-gray-600">Mon-Fri, 9AM-5PM UYT</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full flex-shrink-0 mt-1">
+<i class="ri-map-pin-line text-primary"></i>
+</div>
+<div>
+<h4 class="text-lg font-medium text-gray-800">Location</h4>
+<p class="text-gray-600">Montevideo, Uruguay</p>
+<p class="text-gray-600">Available for remote work worldwide</p>
+</div>
+</div>
+<div class="pt-6">
+<h4 class="text-lg font-medium text-gray-800 mb-4">Connect With Me</h4>
+<div class="flex gap-4">
+<a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-github-fill ri-lg"></i>
+</a>
+<a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-linkedin-fill ri-lg"></i>
+</a>
+<a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-twitter-fill ri-lg"></i>
+</a>
+<a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-all">
+<i class="ri-instagram-fill ri-lg"></i>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-8 md:py-12">
+<div class="container mx-auto px-4 md:px-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+<div class="mb-8 md:mb-0">
+<h3 class="text-2xl font-['Pacifico'] mb-2">Lucas Vazquez</h3>
+<p class="text-gray-400">Full Stack Developer & Code Enthusiast</p>
+</div>
+<div class="flex flex-col items-center md:items-end">
+<p class="text-gray-400 mb-2">© 2025 Lucas Vazquez. All rights reserved.</p>
+<p class="text-gray-500">Made with <i class="ri-heart-fill text-primary"></i> and lots of coffee</p>
+</div>
+</div>
+</div>
+</footer>
+<!-- Navigation Menu -->
+<nav class="fixed bottom-6 md:top-6 left-1/2 transform -translate-x-1/2 z-50">
+<div class="bg-white rounded-full shadow-lg px-3 md:px-6 py-2 md:py-3 flex items-center gap-1 sm:gap-2">
+<a href="#hero" class="nav-link px-2 md:px-3 py-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 transition-all text-sm md:text-base">
+<i class="ri-home-line block md:hidden mb-1"></i>
+<span class="hidden md:inline">Home</span>
+</a>
+<a href="#about" class="nav-link px-2 md:px-3 py-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 transition-all text-sm md:text-base">
+<i class="ri-user-line block md:hidden mb-1"></i>
+<span class="hidden md:inline">About</span>
+</a>
+<a href="#skills" class="nav-link px-2 md:px-3 py-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 transition-all text-sm md:text-base">
+<i class="ri-lightbulb-line block md:hidden mb-1"></i>
+<span class="hidden md:inline">Skills</span>
+</a>
+<a href="#projects" class="nav-link px-2 md:px-3 py-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 transition-all text-sm md:text-base">
+<i class="ri-folder-line block md:hidden mb-1"></i>
+<span class="hidden md:inline">Projects</span>
+</a>
+<a href="#contact" class="nav-link px-2 md:px-3 py-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 transition-all text-sm md:text-base">
+<i class="ri-mail-line block md:hidden mb-1"></i>
+<span class="hidden md:inline">Contact</span>
+</a>
+</div>
+</nav>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Create particles
+const particlesContainer = document.querySelector('.particles');
+for (let i = 0; i < 50; i++) {
+const particle = document.createElement('div');
+particle.classList.add('particle');
+particle.style.width = Math.random() * 10 + 'px';
+particle.style.height = particle.style.width;
+particle.style.left = Math.random() * 100 + '%';
+particle.style.top = Math.random() * 100 + '%';
+particle.style.animationDuration = (Math.random() * 15 + 5) + 's';
+particle.style.animationDelay = (Math.random() * 5) + 's';
+particlesContainer.appendChild(particle);
+}
+// Skill card flip functionality
+const skillFlipBtns = document.querySelectorAll('.skill-flip-btn');
+skillFlipBtns.forEach(btn => {
+btn.addEventListener('click', function() {
+const card = this.closest('.skill-card');
+card.classList.toggle('flipped');
+if (card.classList.contains('flipped')) {
+// Animate progress bars when card is flipped
+setTimeout(() => {
+const progressBars = card.querySelectorAll('.progress-fill');
+const percentages = card.querySelectorAll('.skill-percentage');
+progressBars.forEach((bar, index) => {
+const percentage = bar.getAttribute('data-percentage');
+bar.style.width = percentage + '%';
+// Animate percentage counter
+let startValue = 0;
+const endValue = parseInt(percentage);
+const duration = 1500;
+const increment = endValue / (duration / 16);
+const updateCounter = () => {
+if (startValue < endValue) {
+startValue += increment;
+percentages[index].textContent = Math.floor(startValue) + '%';
+requestAnimationFrame(updateCounter);
+} else {
+percentages[index].textContent = endValue + '%';
+}
+};
+updateCounter();
+});
+}, 300);
+}
+});
+});
+// Custom cursor
+const cursor = document.querySelector('.custom-cursor');
+const cursorDot = document.querySelector('.cursor-dot');
+document.addEventListener('mousemove', (e) => {
+cursor.style.left = e.clientX + 'px';
+cursor.style.top = e.clientY + 'px';
+cursorDot.style.left = e.clientX + 'px';
+cursorDot.style.top = e.clientY + 'px';
+});
+// Hover effect on interactive elements
+const interactiveElements = document.querySelectorAll('a, button, .project-card, .tilt-card');
+interactiveElements.forEach(el => {
+el.addEventListener('mouseenter', () => {
+cursor.style.width = '50px';
+cursor.style.height = '50px';
+cursor.style.backgroundColor = 'rgba(99, 102, 241, 0.2)';
+});
+el.addEventListener('mouseleave', () => {
+cursor.style.width = '30px';
+cursor.style.height = '30px';
+cursor.style.backgroundColor = 'rgba(99, 102, 241, 0.3)';
+});
+});
+// 3D tilt effect on cards
+const tiltCards = document.querySelectorAll('.tilt-card');
+tiltCards.forEach(card => {
+card.addEventListener('mousemove', (e) => {
+const rect = card.getBoundingClientRect();
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+const centerX = rect.width / 2;
+const centerY = rect.height / 2;
+const tiltX = (y - centerY) / 20;
+const tiltY = (centerX - x) / 20;
+card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+});
+card.addEventListener('mouseleave', () => {
+card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+});
+});
+// Scroll reveal animation
+const sections = document.querySelectorAll('.section');
+const revealSection = (entries, observer) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.classList.add('active');
+observer.unobserve(entry.target);
+}
+});
+};
+const sectionObserver = new IntersectionObserver(revealSection, {
+root: null,
+threshold: 0.15
+});
+sections.forEach(section => {
+sectionObserver.observe(section);
+});
+// Active navigation link based on scroll position
+const navLinks = document.querySelectorAll('.nav-link');
+const updateActiveLink = () => {
+const scrollPosition = window.scrollY;
+document.querySelectorAll('section').forEach(section => {
+const sectionTop = section.offsetTop - 100;
+const sectionHeight = section.offsetHeight;
+const sectionId = section.getAttribute('id');
+if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+navLinks.forEach(link => {
+link.classList.remove('bg-primary', 'text-white');
+link.classList.add('text-gray-600');
+if (link.getAttribute('href') === `#${sectionId}`) {
+link.classList.remove('text-gray-600');
+link.classList.add('bg-primary', 'text-white');
+}
+});
+}
+});
+};
+window.addEventListener('scroll', updateActiveLink);
+updateActiveLink();
+// Smooth scrolling for navigation links
+navLinks.forEach(link => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+const targetId = link.getAttribute('href');
+const targetSection = document.querySelector(targetId);
+window.scrollTo({
+top: targetSection.offsetTop,
+behavior: 'smooth'
+});
+});
+});
+// Typing effect for hero subtitle
+const typingElement = document.querySelector('.typing-effect');
+const text = typingElement.textContent;
+typingElement.textContent = '';
+let i = 0;
+const typeWriter = () => {
+if (i < text.length) {
+typingElement.textContent += text.charAt(i);
+i++;
+setTimeout(typeWriter, 100);
+}
+};
+setTimeout(typeWriter, 1000);
+});
+</script>
+</body>
+</html>
